@@ -69,10 +69,43 @@ if(likeClass.nameClass === "active")
 const nameProduct = document.querySelector(".title").textContent //4.Название товара 
 product.name = nameProduct
 
-//5.Массивы бирок, категорий и скидок
-//6.Цена товара с учётом скидки
-//7.Цена товара без скидки
-//8.Размер скидки
+const tags = {}
+product.tags = tags
+const tagsList = document.querySelector(".tags") //5.Массивы бирок, категорий и скидок
+const category = []
+const discount = []
+const label = []
+const tagsArr = tagsList.querySelectorAll("span")
+tagsArr.forEach((element) => {
+  const className = element.className
+  const text = element.textContent
+  if(className === "green"){
+    category.push(text)
+  } else if(className === "blue")
+  {
+    label.push(text)
+  } else if(className === "red"){
+    discount.push(text)
+  }
+})
+tags.category = category
+tags.label = label
+tags.discount = discount
+
+const price = document.querySelector(".price").textContent //6.Цена товара с учётом скидки
+const priceNumber = price.match(/\d+[\.,]?\d*/g)
+  const newPrice = priceNumber[0]
+  const oldPrice = priceNumber[priceNumber.length-1]
+  const discountPrice = oldPrice - newPrice
+  const discountPercent = Math.round((1 - newPrice / oldPrice) * 100)
+product.price = +newPrice //7.Цена товара без скидки
+product.old = +oldPrice
+product.discount = +discountPrice//8.Размер скидки
+product.discountPercent = discountPercent + "%"
+
+
+
+
 //9.Валюта
 //10.Свойства товара
 //11.Полное описание, скрытое под сворачиваемым блоком
