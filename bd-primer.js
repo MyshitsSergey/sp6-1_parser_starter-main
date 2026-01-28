@@ -18,6 +18,8 @@
       "type": "website"
     }
   },
+
+
   "product": {
     "id": "product1",
     "name": "About Vite",
@@ -72,6 +74,8 @@
       }
     ]
   },
+
+
   "suggested": [
     {
       "name": "test title",
@@ -102,10 +106,13 @@
       "currency": "RUB"
     }
   ],
+
+
   "reviews": [
     {
       "rating": 2,
-      "author": {
+      "author": 
+      {
         "avatar": "https://placehold.co/48/424242/white.svg?text=1",
         "name": "author"
       },
@@ -115,7 +122,8 @@
     },
     {
       "rating": 4,
-      "author": {
+      "author": 
+      {
         "avatar": "https://placehold.co/48/424242/white.svg?text=1",
         "name": "author"
       },
