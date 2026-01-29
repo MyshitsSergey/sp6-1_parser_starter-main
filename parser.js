@@ -97,18 +97,81 @@ const priceNumber = price.match(/\d+[\.,]?\d*/g)
   const newPrice = priceNumber[0]
   const oldPrice = priceNumber[priceNumber.length-1]
   const discountPrice = oldPrice - newPrice
-  const discountPercent = Math.round((1 - newPrice / oldPrice) * 100)
-product.price = +newPrice //7.Цена товара без скидки
-product.old = +oldPrice
-product.discount = +discountPrice//8.Размер скидки
-product.discountPercent = discountPercent + "%"
+
+product.price = +newPrice //Цена товара с учётом скидки
+product.old = +oldPrice  //7.Цена товара без скидки
+product.discount = +discountPrice  
 
 
+product.discountPercent = discountCalc (newPrice, oldPrice) //8.Размер скидки
 
+function discountCalc (newPrice, oldPrice) {
+  const discountPercent = ((1 - newPrice / oldPrice) * 100).toFixed(1)
+  if(discountPercent > 0) {
+    return discountPercent + "%"
+  } else return discountPercent = "0%"
+} 
 
 //9.Валюта
+product.currency = currencyList(price)
+
+function currencyList(price){
+  const priceStr = String(price)
+  if(priceStr.includes("$")){return "USD"} else 
+    if(priceStr.includes("€")){return "EUR"} else 
+      if(priceStr.includes("₽") || (priceStr.includes("руб"))){return "RUB"} else return "UNKNOWN"
+}
+
 //10.Свойства товара
+
+const propertiesList = document.querySelector(".properties")
+const propertiesArr = propertiesList.querySelectorAll("li")
+const properties = {}
+
+propertiesArr.forEach((element) => {
+  const list = element.querySelectorAll("span")
+  if(list.length >= 2) {
+    const key = list[0].textContent.trim()
+    const value = list[1].textContent.trim()
+    properties[key] = value
+  }
+})
+product.properties = properties
+
 //11.Полное описание, скрытое под сворачиваемым блоком
+
+const descriptionUnused = document.querySelector(".description").innerHTML
+product.description = descriptionUnused
+
+//----------------------------------------------------------------------------------------------
+const suggested = {}
+/*Массив дополнительных товаров.
+Здесь нужно получить все карточки и перебрать их в цикле, чтобы сформировать массив.
+Для каждого элемента соберите следующую информацию:
+-ссылка на изображение,
+-название товара,
+-цена,
+-валюта,
+-описание.*/
+
+const suggestedSelector = document.querySelector(".suggested").querySelector(".items")
+// const suggestedArr = suggestedSelector.querySelector("items")
+
+
+//--------------------------------------------------------------------------------------------------
+const reviews = {}
+/*Массив обзоров
+Получите всё аналогично предыдущему блоку. В цикле переберите карточки, чтобы сформировать массив.
+Для каждого элемента извлеките:
+-рейтинг — количество заполненных звезд;
+-заголовок обзора;
+-описание;
+-автор — объект должен содержать аватар и имя;
+-дата обзора — отформатируйте её в формате DD.MM.YYYY.*/
+
+const reviewsSelector = document.querySelector(".reviews").querySelector(".items")
+
+
 
 
 function parsePage() {
