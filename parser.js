@@ -144,7 +144,7 @@ const descriptionUnused = document.querySelector(".description").innerHTML
 product.description = descriptionUnused
 
 //----------------------------------------------------------------------------------------------
-const suggested = {}
+const suggested = []
 /*Массив дополнительных товаров.
 Здесь нужно получить все карточки и перебрать их в цикле, чтобы сформировать массив.
 Для каждого элемента соберите следующую информацию:
@@ -155,11 +155,24 @@ const suggested = {}
 -описание.*/
 
 const suggestedSelector = document.querySelector(".suggested").querySelector(".items")
-// const suggestedArr = suggestedSelector.querySelector("items")
+const suggestedArr = suggestedSelector.querySelectorAll("article")
+suggestedArr.forEach((element) => {
+  const simbolPrice = element.querySelector("b").textContent
+  
+  const suggestedInfo = {
+    name: element.querySelector("h3").textContent,
+    description: element.querySelector("p").textContent,
+    image: element.querySelector("img").getAttribute("src"),
+    price: currencyList(simbolPrice),
+
+    currency: element.querySelector("b").textContent.match(/\d+[\.,]?\d*/g).join("")
+  } 
+  suggested.push(suggestedInfo)
+})
 
 
 //--------------------------------------------------------------------------------------------------
-const reviews = {}
+const reviews = []
 /*Массив обзоров
 Получите всё аналогично предыдущему блоку. В цикле переберите карточки, чтобы сформировать массив.
 Для каждого элемента извлеките:
@@ -169,7 +182,36 @@ const reviews = {}
 -автор — объект должен содержать аватар и имя;
 -дата обзора — отформатируйте её в формате DD.MM.YYYY.*/
 
-const reviewsSelector = document.querySelector(".reviews").querySelector(".items")
+const reviewsSelector = document.querySelector(".reviews").querySelectorAll("article")
+let ratingStats = {} // Объект для статистики
+
+reviewsSelector.forEach((article) => {
+  // querySelector вернет первый найденный элемент .rating
+  const ratingElement = article.querySelector(".rating")
+  // Если нашли элемент .rating
+  if (ratingElement) {
+    // Считаем заполненные звезды
+    const filledStars = ratingElement.querySelectorAll(".filled").length //length возвращает количество элементов в NodeList
+    ratingStats = {rating:filledStars }
+  }
+
+
+  const ratingElementAuthor = article.querySelector(".author")
+  const autorImg = ratingElementAuthor.querySelector("img").getAttribute("src")
+  const autorName = ratingElementAuthor.querySelector("span").textContent
+  //автор — объект должен содержать аватар и имя;
+  const autor = {
+    avatar: autorImg,
+    name: autorName
+  }
+  ratingStats.autor = autor
+
+
+  reviews.push(ratingStats)
+})
+
+
+
 
 
 
