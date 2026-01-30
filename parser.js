@@ -5,6 +5,10 @@ meta.language = pageLanguage
 
 const pageTitle = document.querySelector("title") //2.Название страницы
 const titleText = pageTitle.textContent
+
+// const [titleTextpartName] = titleText.split("—"); // Берем только первую часть
+// meta.title = titleTextpartName;
+
 const [titleTextpartName, titleTextpartDiscrip] = titleText.split("—");
 meta.title = titleTextpartName.trim() //Сохр в meta Название страницы
 
@@ -31,7 +35,7 @@ ogElements.forEach(element => {
     // Получаем полное свойство (например, "og:title")
     const property = element.getAttribute("property");
     // Получаем значение
-    const content = element.getAttribute("content");
+    const content = element.getAttribute("content").split("—")[0].trim()
     // Убираем префикс "og:" и используем как ключ объекта
     const key = property.replace(/^og:/, '');
     // Добавляем в объект
@@ -61,10 +65,11 @@ imagesText.forEach((element) => {
 product.images = images
 
 const likeClass = document.querySelector(".like") //3.Статус лайка
-if(likeClass.nameClass === "active")
-{
-  product.isLiked = true
-} else product.isLiked = false
+// if(likeClass.nameClass === "active")  <---------------------------------------------
+// {
+//   product.isLiked = true
+// } else product.isLiked = false
+product.isLiked = likeClass && likeClass.classList.contains("active");
 
 const nameProduct = document.querySelector(".title").textContent //4.Название товара 
 product.name = nameProduct
@@ -99,17 +104,17 @@ const priceNumber = price.match(/\d+[\.,]?\d*/g)
   const discountPrice = oldPrice - newPrice
 
 product.price = +newPrice //Цена товара с учётом скидки
-product.old = +oldPrice  //7.Цена товара без скидки
+product.oldPrice = +oldPrice;  //7.Цена товара без скидки
 product.discount = +discountPrice  
 
 
 product.discountPercent = discountCalc (newPrice, oldPrice) //8.Размер скидки
 
 function discountCalc (newPrice, oldPrice) {
-  const discountPercent = ((1 - newPrice / oldPrice) * 100).toFixed(1)
+  const discountPercent = ((1 - newPrice / oldPrice) * 100).toFixed(2)
   if(discountPercent > 0) {
     return discountPercent + "%"
-  } else return discountPercent = "0%"
+  } else return "0%"
 } 
 
 //9.Валюта
@@ -140,8 +145,17 @@ product.properties = properties
 
 //11.Полное описание, скрытое под сворачиваемым блоком
 
-const descriptionUnused = document.querySelector(".description").innerHTML
-product.description = descriptionUnused
+// const descriptionElement = document.querySelector(".description");
+// product.description = descriptionElement.innerHTML.trim(); // или просто innerHTML
+
+const descriptionElement = document.querySelector(".description");
+const clone = descriptionElement.cloneNode(true);
+
+const h3 = clone.querySelector("h3");
+if (h3) h3.removeAttribute("class");
+
+product.description = clone.innerHTML.trim();
+
 
 //----------------------------------------------------------------------------------------------
 const suggested = []
@@ -156,6 +170,7 @@ const suggested = []
 
 const suggestedSelector = document.querySelector(".suggested").querySelector(".items")
 const suggestedArr = suggestedSelector.querySelectorAll("article")
+
 suggestedArr.forEach((element) => {
   const simbolPrice = element.querySelector("b").textContent
   
@@ -163,16 +178,14 @@ suggestedArr.forEach((element) => {
     name: element.querySelector("h3").textContent,
     description: element.querySelector("p").textContent,
     image: element.querySelector("img").getAttribute("src"),
-    price: currencyList(simbolPrice),
-
-    currency: element.querySelector("b").textContent.match(/\d+[\.,]?\d*/g).join("")
+    price: element.querySelector("b").textContent.match(/\d+[\.,]?\d*/g).join(""),
+    currency:  currencyList(simbolPrice)
   } 
   suggested.push(suggestedInfo)
 })
 
 
 //--------------------------------------------------------------------------------------------------
-const reviews = []
 /*Массив обзоров
 Получите всё аналогично предыдущему блоку. В цикле переберите карточки, чтобы сформировать массив.
 Для каждого элемента извлеките:
@@ -182,33 +195,82 @@ const reviews = []
 -автор — объект должен содержать аватар и имя;
 -дата обзора — отформатируйте её в формате DD.MM.YYYY.*/
 
-const reviewsSelector = document.querySelector(".reviews").querySelectorAll("article")
-let ratingStats = {} // Объект для статистики
+// const reviewsSelector = document.querySelector(".reviews").querySelectorAll("article")
+// let ratingStats = {} // Объект для статистики
+
+
+
+// reviewsSelector.forEach((article) => {
+//   // querySelector вернет первый найденный элемент .rating
+//   const ratingElement = article.querySelector(".rating")
+//   // Если нашли элемент .rating
+//   if (ratingElement) {
+//     // Считаем заполненные звезды
+//     const filledStars = ratingElement.querySelectorAll(".filled").length //length возвращает количество элементов в NodeList
+//     ratingStats = {rating:filledStars }
+//   }
+
+
+//   const ratingElementAuthor = article.querySelector(".author")
+//   const autorImg = ratingElementAuthor.querySelector("img").getAttribute("src")
+//   const autorName = ratingElementAuthor.querySelector("span").textContent
+
+//   //автор — объект должен содержать аватар и имя;
+//   const author = {
+//     avatar: autorImg,
+//     name: autorName
+//   }
+
+//   const dateNumber = ratingElementAuthor.querySelector("i").textContent
+//   const [day, month, year] = dateNumber.split("/")
+//   const date = new Date (year, month - 1, day)
+
+//   const title = article.querySelector(".title").textContent
+
+//   const description = article.querySelector("p").textContent
+
+//   ratingStats.autor = author
+//   ratingStats.date = date
+//   ratingStats.title = title
+//   ratingStats.description = description
+  
+//   reviews.push(ratingStats)
+  
+// })
+
+
+const reviews = [];
+
+const reviewsSelector = document.querySelector(".reviews").querySelectorAll("article");
 
 reviewsSelector.forEach((article) => {
-  // querySelector вернет первый найденный элемент .rating
-  const ratingElement = article.querySelector(".rating")
-  // Если нашли элемент .rating
-  if (ratingElement) {
-    // Считаем заполненные звезды
-    const filledStars = ratingElement.querySelectorAll(".filled").length //length возвращает количество элементов в NodeList
-    ratingStats = {rating:filledStars }
-  }
+  const ratingElement = article.querySelector(".rating");
+  const rating = ratingElement
+    ? ratingElement.querySelectorAll(".filled").length
+    : 0;
 
+  const authorBlock = article.querySelector(".author");
+  const author = {
+    avatar: authorBlock.querySelector("img").getAttribute("src"),
+    name: authorBlock.querySelector("span").textContent
+  };
 
-  const ratingElementAuthor = article.querySelector(".author")
-  const autorImg = ratingElementAuthor.querySelector("img").getAttribute("src")
-  const autorName = ratingElementAuthor.querySelector("span").textContent
-  //автор — объект должен содержать аватар и имя;
-  const autor = {
-    avatar: autorImg,
-    name: autorName
-  }
-  ratingStats.autor = autor
+  const dateText = authorBlock.querySelector("i").textContent;
+  const [day, month, year] = dateText.split("/");
+  const date = `${day.padStart(2, "0")}.${month.padStart(2, "0")}.${year}`;
 
+  const title = article.querySelector(".title").textContent;
+  const description = article.querySelector("p").textContent;
 
-  reviews.push(ratingStats)
-})
+  reviews.push({
+    rating,
+    title,
+    description,
+    author,
+    date
+  });
+});
+
 
 
 
@@ -218,10 +280,10 @@ reviewsSelector.forEach((article) => {
 
 function parsePage() {
     return {
-        meta: {},
-        product: {},
-        suggested: [],
-        reviews: []
+        meta: meta,
+        product: product,
+        suggested: suggested,
+        reviews: reviews
     };
 }
 
